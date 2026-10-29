@@ -87,7 +87,7 @@ sam delete --stack-name todo-sam-wilbert
 
 ### Video de pruebas
 
-Pruebas del CRUD completo, casos de error (400 y 404), logs en CloudWatch y `sam delete`:
+Pruebas del CRUD listar por id, put, delete, casos de error (400 y 404), logs en CloudWatch y `sam delete`:
 
 [Ver video](capturas/get-id,%20put,%20delete,%20error%20(400,404),%20logs,%20sam-delete.mp4)
 
