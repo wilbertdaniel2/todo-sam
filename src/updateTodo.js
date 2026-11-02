@@ -1,5 +1,5 @@
 import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { ddb, TABLE_NAME, response, parseBody } from "./utils.js";
+import { ddb, TABLE_NAME, response, parseBody, publishEvent } from "./utils.js";
 
 export const handler = async (event) => {
   const { id } = event.pathParameters;
@@ -35,6 +35,7 @@ export const handler = async (event) => {
     return response(400, { message: "Envía 'title' y/o 'completed'" });
   }
 
+  let todo;
   try {
     const result = await ddb.send(
       new UpdateCommand({
@@ -47,11 +48,17 @@ export const handler = async (event) => {
         ReturnValues: "ALL_NEW",
       })
     );
-    return response(200, result.Attributes);
+    todo = result.Attributes;
   } catch (err) {
     if (err.name === "ConditionalCheckFailedException") {
       return response(404, { message: `TODO ${id} no existe` });
     }
     throw err;
   }
+
+  // Evento más específico si el TODO se marcó como completado
+  const eventType = data.completed === true ? "todo.completed" : "todo.updated";
+  await publishEvent(eventType, todo);
+
+  return response(200, todo);
 };
