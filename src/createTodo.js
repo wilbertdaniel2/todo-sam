@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
-import { ddb, TABLE_NAME, response, parseBody } from "./utils.js";
+import { ddb, TABLE_NAME, response, parseBody, publishEvent } from "./utils.js";
 
 export const handler = async (event) => {
   const data = parseBody(event);
@@ -23,5 +23,6 @@ export const handler = async (event) => {
   };
 
   await ddb.send(new PutCommand({ TableName: TABLE_NAME, Item: item }));
+  await publishEvent("todo.created", item);
   return response(201, item);
 };
